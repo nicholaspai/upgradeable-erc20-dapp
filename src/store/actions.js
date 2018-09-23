@@ -3,6 +3,7 @@ export const TYPES = {
 	SET_GAS: "SET_GAS",
 	SET_WEB3_LOADING: "SET_WEB3_LOADING",
 	SET_VERIFIED_ADDRESS: "SET_VERIFIED_ADDRESS",
+	SET_BALANCE: "SET_BALANCE",
 	SET_HOME: "SET_HOME",
 	SET_LOGIN: "SET_LOGIN",
 	SET_ADMIN: "SET_ADMIN",
@@ -21,6 +22,10 @@ export const actions = {
 	setVerifiedAddress: address => ({
 		type: TYPES.SET_VERIFIED_ADDRESS,
 		address
+	}),
+	setBalance: balance => ({
+		type: TYPES.SET_BALANCE,
+		balance
 	}),
 	setHome: bool => ({
 		type: TYPES.SET_HOME,

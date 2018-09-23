@@ -12,9 +12,7 @@ import Typography from '@material-ui/core/Typography';
 // Custom Components
 import SimpleLineChart from '../SimpleLineChart';
 import SimpleTable from '../SimpleTable';
-import SendERC20 from '../web3/SendERC20';
-import Balance from '../web3/Balance'
-import Burn from '../web3/Burn'
+import Mint from '../web3/Mint'
 
 // Redux
 import { connect } from 'react-redux'
@@ -37,7 +35,7 @@ const styles = theme => ({
   },
 });
 
-class Home extends React.Component {
+class Admin extends React.Component {
   render() {
     const { classes } = this.props;
 
@@ -47,31 +45,17 @@ class Home extends React.Component {
         <div>
           <div className={classes.appBarSpacer} />
                 <Typography variant="display1" gutterBottom>
-                  Transfer and burn UpgradeableERC20
+                  You must be the contract owner to use these controls
                 </Typography>
-                <Balance />
-                <SendERC20 />
-                <Burn />
-                {/*<Typography variant="display1" gutterBottom>
-                   Transactions History
-                 </Typography>
-                 <Typography component="div" className={classes.chartContainer}>
-                   <SimpleLineChart />
-                 </Typography>
-                 <Typography variant="display1" gutterBottom>
-                   Transactions
-                 </Typography>
-                 <div className={classes.tableContainer}>
-                   <SimpleTable />
-                 </div> */}
+                <Mint />
         </div>
       </React.Fragment>
     );
   }
 }
 
-Home.propTypes = {
+Admin.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default connect(mapState, mapDispatch)(withStyles(styles)(Home));
+export default connect(mapState, mapDispatch)(withStyles(styles)(Admin));

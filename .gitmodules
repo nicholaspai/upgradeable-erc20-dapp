@@ -1,3 +1,6 @@
 [submodule "UpgradeableERC20"]
 	path = UpgradeableERC20
 	url = git@github.com:nicholaspai/UpgradeableERC20.git
+[submodule "src/UpgradeableERC20"]
+	path = src/UpgradeableERC20
+	url = git@github.com:nicholaspai/UpgradeableERC20.git

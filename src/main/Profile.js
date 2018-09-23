@@ -10,6 +10,7 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
 
 // MUI Icons
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -25,11 +26,13 @@ import { actions } from '../store/actions'
 import { withWeb3 } from 'react-web3-provider'
 
 const mapState = state => ({
-  verifiedAddress: state.general.verifiedAddress
+  verifiedAddress: state.general.verifiedAddress,
+  gasPrice: state.general.gas,
 });
 
 const mapDispatch = dispatch => ({
   setVerifiedAddress: address => dispatch(actions.setVerifiedAddress(address)),
+  setGasPrice: gas => dispatch(actions.setGas(gas))
 })
 
 const styles = theme => ({
@@ -44,7 +47,11 @@ const styles = theme => ({
     color: theme.palette.text.secondary,
   },
   button: {
-    margin: theme.spacing.unit * 2
+    // margin: theme.spacing.unit * 2
+  },
+  textField: {
+    margin: theme.spacing.unit * 2,
+    width: 400
   }
 });
 
@@ -53,13 +60,14 @@ class Profile extends React.Component {
     expanded: null,
     awaitingMetaMask: false,
     metamaskAlertOpen: false,
+    newGasCost: 0,
   };
 
   handleCloseAlert = () => {
     this.setState({ metamaskAlertOpen: false})
   }
 
-  handleChange = panel => (event, expanded) => {
+  handleChangePanel = panel => (event, expanded) => {
     this.setState({
       expanded: expanded ? panel : false,
     });
@@ -112,9 +120,25 @@ class Profile extends React.Component {
     }
   };
 
+  handleChange = name => event => {
+  this.setState({
+      [name]: event.target.value,
+    })
+  }
+
+  submitGas = () => {
+    if(this.state.newGasCost > 0) {
+      this.props.setGasPrice(this.state.newGasCost)
+      return;
+    } else {
+      console.log('Please enter a gas cost greater than 0')
+      return;
+    }
+  }
+
   render() {
     const { classes } = this.props;
-    const { expanded, awaitingMetaMask } = this.state
+    const { expanded, awaitingMetaMask, newGasCost } = this.state
     return (
       <React.Fragment>
         <CssBaseline />
@@ -122,7 +146,7 @@ class Profile extends React.Component {
                 <Typography variant="display1" gutterBottom>
                   Profile
                 </Typography>
-                <ExpansionPanel expanded={expanded === 'panel1'} onChange={this.handleChange('panel1')}>
+                <ExpansionPanel expanded={expanded === 'panel1'} onChange={this.handleChangePanel('panel1')}>
                   <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography className={classes.heading}>Login</Typography>
                     <Typography className={classes.secondaryHeading}>
@@ -145,7 +169,6 @@ class Profile extends React.Component {
                         </Button>) : (
                         <Button
                           variant="contained"
-                          size="large"
                           color="primary"
                           onClick={this.handleClickOpen}
                           className={classes.button}
@@ -153,6 +176,32 @@ class Profile extends React.Component {
                           Verify address
                         </Button>)
                       }
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+                <ExpansionPanel expanded={expanded === 'panel2'} onChange={this.handleChangePanel('panel2')}>
+                  <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography className={classes.heading}>Set Default Gas Price</Typography>
+                    <Typography className={classes.secondaryHeading}>
+                      The default gas price used for sending transactions is:  {this.props.gasPrice} Gwei
+                    </Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <TextField 
+                      label="Gas cost in Gwei" 
+                      className={classes.textField}
+                      type="number"
+                      value={newGasCost}
+                      onChange={this.handleChange('newGasCost')}
+                      margin="normal"
+                      helperText="Enter a positive number"
+                    />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={this.submitGas}
+                    >
+                    Update Gas cost
+                    </Button>
                   </ExpansionPanelDetails>
                 </ExpansionPanel>
                 <MetaMaskAlert open={this.state.metamaskAlertOpen} handleClose={this.handleCloseAlert} />

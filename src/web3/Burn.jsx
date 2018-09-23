@@ -12,24 +12,28 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 
 // Icons
 import KeyboardArrowUp from "@material-ui/icons/KeyboardArrowUp";
-
+// Redux
+import { connect } from "react-redux";
+import { actions } from '../store/actions'
+// Custom Components
+import MetaMaskAlert from "./MetaMaskAlert";
 // Web3
 import { withWeb3 } from "react-web3-provider";
 const contract = require("truffle-contract");
 
-// Redux
-import { connect } from "react-redux";
 
-// Custom Components
-import MetaMaskAlert from "./MetaMaskAlert";
 
-// Carbon Dollar
-const abi_CUSD = require("../../../contracts/CarbonDollar.json");
-let CUSD = contract(abi_CUSD);
+// TokenProxy
+const abi_proxy = require("../UpgradeableERC20/build/contracts/TokenProxy.json");
+let TokenProxy = contract(abi_proxy);
 
-// CD Factory
-const abi_CUSD_Factory = require("../../../contracts/CDFactory.json");
-let CUSD_Factory = contract(abi_CUSD_Factory);
+// Token_V0
+const abi_v0 = require("../UpgradeableERC20/build/contracts/Token_V0.json");
+let Token_V0 = contract(abi_v0);
+
+// Token_V1
+const abi_v1 = require("../UpgradeableERC20/build/contracts/Token_V1.json");
+let Token_V1 = contract(abi_v1);
 
 const styles = theme => ({
   root: {
@@ -47,14 +51,16 @@ const styles = theme => ({
 });
 
 const mapState = state => ({
-  verifiedPublicAddress: state.settings.publicAddress,
-  nickname: state.settings.nickname,
-  getCUSDBalance: state.web3.cusdBalance
+  verifiedAddress: state.general.verifiedAddress,
+  gasPrice: state.general.gas,
+  balance: state.general.balance,
 });
 
-const mapDispatch = dispatch => ({});
+const mapDispatch = dispatch => ({
+  setBalance: balance => dispatch(actions.setBalance(balance)),
+});
 
-class SendCUSD extends Component {
+class Burn extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -62,7 +68,6 @@ class SendCUSD extends Component {
       recipientAddress: "",
       amount: 0,
       metaMaskAlertOpen: false,
-      gasDefault: "25",
       open: false,
       transactionPending: false
     };
@@ -79,11 +84,14 @@ class SendCUSD extends Component {
     if (web3) {
       // Injected Web3 has been detected
       web3.eth.getCoinbase().then(address => {
-        if (address === this.props.verifiedPublicAddress) {
+        if (address === this.props.verifiedAddress) {
           // Fetched web3 list of active accounts
-          this.setState({
-            open: true
-          });
+          this.getBalance().then(balance => {
+            this.props.setBalance(balance)
+            this.setState({
+              open: true
+            });
+          })
         } else {
           this.setState({
             metaMaskAlertOpen: true
@@ -98,27 +106,25 @@ class SendCUSD extends Component {
     }
   };
 
-  // Prompt metamask account owner to send ETH to user.
-  send = () => {
-    CUSD_Factory.setProvider(this.props.web3.currentProvider);
-    CUSD.setProvider(this.props.web3.currentProvider);
+  // Prompt metamask account owner to burn ETH from user.
+  burn = () => {
+    TokenProxy.setProvider(this.props.web3.currentProvider);
+    Token_V0.setProvider(this.props.web3.currentProvider);
 
-    let gasPrice = this.props.web3.utils.toWei(this.state.gasDefault, "gwei");
+    let gasPrice = this.props.web3.utils.toWei(this.props.gasPrice.toString(), "gwei");
     let conversion = 10 ** 18; // Same conversion as WEI to ETH
 
     return new Promise((resolve, reject) => {
-      CUSD_Factory.deployed().then(cusdFactory => {
-        cusdFactory.getToken(0).then(cusdAddress => {
-          CUSD.at(cusdAddress).then(cusd => {
+      TokenProxy.deployed().then(proxy => {
+          Token_V0.at(proxy.address).then(v0 => {
             this.setState({
               transactionPending: true
             });
-            cusd
-              .transfer(
-                this.state.recipientAddress,
+            v0
+              .burn(
                 this.state.amount * conversion,
                 {
-                  from: this.props.verifiedPublicAddress,
+                  from: this.props.verifiedAddress,
                   gasPrice
                 }
               )
@@ -131,11 +137,10 @@ class SendCUSD extends Component {
               .catch(error => {
                 reject(error.message);
                 this.setState({
-                  transactionPending: false
+                  transactionPending: false,
                 });
               });
           });
-        });
       });
     });
   };
@@ -148,11 +153,44 @@ class SendCUSD extends Component {
     });
   };
 
-  handleSendCUSD = () => {
+  getBalance = () => {
+    TokenProxy.setProvider(this.props.web3.currentProvider);
+    Token_V0.setProvider(this.props.web3.currentProvider);
+
+    let conversion = 10 ** 18; // Same conversion as WEI to ETH
+
+    return new Promise((resolve, reject) => {
+      TokenProxy.deployed().then(proxy => {
+          Token_V0.at(proxy.address).then(v0 => {
+            this.setState({
+              loading: true
+            });
+            v0
+              .balanceOf(
+                this.props.verifiedAddress,
+              )
+              .then(tx => {
+                resolve(tx/conversion);
+                this.setState({
+                  loading: false
+                });
+              })
+              .catch(error => {
+                reject(error.message);
+                this.setState({
+                  loading: false
+                });
+              });
+          });
+      });
+    });
+  };
+
+  handleBurnERC20 = () => {
     this.setState({
       loading: true
     });
-    this.send()
+    this.burn()
       .then(signature => {
         this.handleClose();
       })
@@ -165,8 +203,7 @@ class SendCUSD extends Component {
     const { classes } = this.props;
     const sendDisabled = Boolean(
       this.state.amount <= 0 ||
-        this.state.amount > this.props.getCUSDBalance ||
-        !this.state.recipientAddress
+        this.state.amount > this.props.balance 
     );
 
     return (
@@ -178,7 +215,7 @@ class SendCUSD extends Component {
           className={classes.root}
         >
           <KeyboardArrowUp className={classes.leftIcon} />
-          Send CUSD
+          Burn
         </Button>
         <Dialog
           open={this.state.open}
@@ -186,28 +223,20 @@ class SendCUSD extends Component {
           aria-labelledby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">
-            {"Send CUSD from " + this.props.nickname + "'s wallet"}
+            {"Burn UpgradeableERC20"}
           </DialogTitle>
           <DialogContent style={{ textAlign: "center" }}>
             <DialogContentText id="alert-dialog-description">
-              Click 'Confirm' to send CUSD to your chosen address. The default
-              gas amount is <b>{this.state.gasDefault}</b> Gwei, which you can
+              Click 'Confirm' to burn UpgradeableERC20 from your verified address. The default
+              gas amount is currently set to <b>{this.props.gasPrice}</b> Gwei, which you can
               change in the MetaMask prompt!
             </DialogContentText>
             <TextField
               className={classes.margin}
+              variant="filled"
               onChange={this.handleChange}
-              label="Address that you will send CUSD to"
-              value={this.state.recipientAddress}
-              name="recipientAddress"
-              fullWidth
-              type="text"
-            />
-            <TextField
-              className={classes.margin}
-              onChange={this.handleChange}
-              label="Your current CUSD balance"
-              value={this.props.getCUSDBalance}
+              label="Your current balance"
+              value={this.props.balance}
               InputProps={{
                 readOnly: true
               }}
@@ -215,10 +244,11 @@ class SendCUSD extends Component {
               fullWidth
             />
             <TextField
+              required
               className={classes.margin}
               onChange={this.handleChange}
               name="amount"
-              label="How much CUSD you will send"
+              label="How much you will burn"
               value={this.state.amount}
               helperText="Enter a positive number below your current balance"
               type="number"
@@ -242,7 +272,7 @@ class SendCUSD extends Component {
               <Button disabled>Please sign the transaction in MetaMask!</Button>
             ) : (
               <Button
-                onClick={this.handleSendCUSD}
+                onClick={this.handleBurnERC20}
                 color="primary"
                 variant="contained"
                 disabled={sendDisabled}
@@ -261,7 +291,7 @@ class SendCUSD extends Component {
   }
 }
 
-SendCUSD.propTypes = {
+Burn.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired
 };
@@ -269,4 +299,4 @@ SendCUSD.propTypes = {
 export default connect(
   mapState,
   mapDispatch
-)(withWeb3(withStyles(styles, { withTheme: true })(SendCUSD)));
+)(withWeb3(withStyles(styles, { withTheme: true })(Burn)));

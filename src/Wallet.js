@@ -21,6 +21,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ListItems from './ListItems';
 import Home from './main/Home'
 import Profile from './main/Profile'
+import Admin from './main/Admin'
 
 // Redux
 import { connect } from 'react-redux'
@@ -29,6 +30,7 @@ import { actions } from './store/actions'
 const mapState = state => ({
   home: state.main.home,
   profile: state.main.login,
+  admin: state.main.admin
 });
 
 const mapDispatch = dispatch => ({
@@ -163,6 +165,7 @@ class Wallet extends React.Component {
           <main className={classes.content}>
             {this.props.home ? <Home /> : ""}
             {this.props.profile ? <Profile /> : ""}
+            {this.props.admin ? <Admin /> : ""}
           </main>
         </div>
       </React.Fragment>

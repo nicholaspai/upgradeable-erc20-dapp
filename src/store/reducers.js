@@ -6,6 +6,7 @@ export const initialState = {
 		gas: 25,
 		web3Loading: false,
 		verifiedAddress: "",
+		balance: 0
 	},
 	main: {
 		home: true,
@@ -28,6 +29,10 @@ export const general = (state = initialState.general, action) => {
 		case TYPES.SET_VERIFIED_ADDRESS:
 			return Object.assign({}, state, {
 				verifiedAddress: action.address
+			})
+		case TYPES.SET_BALANCE:
+			return Object.assign({}, state, {
+				balance: action.balance
 			})
 		default:
 			return state

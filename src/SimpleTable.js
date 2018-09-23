@@ -10,7 +10,6 @@ import Paper from '@material-ui/core/Paper';
 
 // Redux
 import { connect } from "react-redux";
-import { actions } from './store/actions'
 
 const mapState = state => ({
   transactions: state.general.transactions,

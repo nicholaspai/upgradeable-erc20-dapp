@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 // MUI Components
 import { withStyles } from '@material-ui/core/styles';

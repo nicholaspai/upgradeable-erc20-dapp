@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 // MUI Components
 import { withStyles } from '@material-ui/core/styles';
@@ -18,7 +17,6 @@ import Burn from '../web3/Burn'
 
 // Redux
 import { connect } from 'react-redux'
-import { actions } from '../store/actions'
 
 const mapState = state => ({
   verifiedAddress: state.general.verifiedAddress

@@ -11,7 +11,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 // Icons
-import KeyboardArrowUp from "@material-ui/icons/KeyboardArrowUp";
+import SwapVert from "@material-ui/icons/SwapVert";
 // Redux
 import { connect } from "react-redux";
 import { actions } from '../store/actions'
@@ -30,10 +30,6 @@ let TokenProxy = contract(abi_proxy);
 // Token_V0
 const abi_v0 = require("../UpgradeableERC20/build/contracts/Token_V0.json");
 let Token_V0 = contract(abi_v0);
-
-// Token_V1
-const abi_v1 = require("../UpgradeableERC20/build/contracts/Token_V1.json");
-let Token_V1 = contract(abi_v1);
 
 const styles = theme => ({
   root: {
@@ -58,6 +54,7 @@ const mapState = state => ({
 
 const mapDispatch = dispatch => ({
   setBalance: balance => dispatch(actions.setBalance(balance)),
+  addTransaction: transaction => dispatch(actions.addTransaction(transaction))
 });
 
 class SendERC20 extends Component {
@@ -172,6 +169,7 @@ class SendERC20 extends Component {
               )
               .then(tx => {
                 resolve(tx/conversion);
+                this.props.addTransaction({ 'hash': tx.tx, 'type': 'transfer'})
                 this.setState({
                   loading: false
                 });
@@ -216,8 +214,8 @@ class SendERC20 extends Component {
           onClick={this.handleOpen}
           className={classes.root}
         >
-          <KeyboardArrowUp className={classes.leftIcon} />
-          Send
+          <SwapVert className={classes.leftIcon} />
+          Send Tokens
         </Button>
         <Dialog
           open={this.state.open}

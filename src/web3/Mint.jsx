@@ -11,16 +11,15 @@ import DialogActions from "@material-ui/core/DialogActions";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 // Icons
-import KeyboardArrowUp from "@material-ui/icons/KeyboardArrowUp";
+import LocalPlay from "@material-ui/icons/LocalPlay";
 // Redux
 import { connect } from "react-redux";
+import { actions } from '../store/actions'
 // Custom Components
 import MetaMaskAlert from "./MetaMaskAlert";
 // Web3
 import { withWeb3 } from "react-web3-provider";
 const contract = require("truffle-contract");
-
-
 
 // TokenProxy
 const abi_proxy = require("../UpgradeableERC20/build/contracts/TokenProxy.json");
@@ -29,10 +28,6 @@ let TokenProxy = contract(abi_proxy);
 // Token_V0
 const abi_v0 = require("../UpgradeableERC20/build/contracts/Token_V0.json");
 let Token_V0 = contract(abi_v0);
-
-// Token_V1
-const abi_v1 = require("../UpgradeableERC20/build/contracts/Token_V1.json");
-let Token_V1 = contract(abi_v1);
 
 const styles = theme => ({
   root: {
@@ -55,7 +50,9 @@ const mapState = state => ({
   balance: state.general.balance,
 });
 
-const mapDispatch = dispatch => ({});
+const mapDispatch = dispatch => ({
+  addTransaction: transaction => dispatch(actions.addTransaction(transaction)),
+});
 
 class Mint extends Component {
   constructor(props) {
@@ -125,6 +122,7 @@ class Mint extends Component {
               )
               .then(tx => {
                 resolve(tx);
+                this.props.addTransaction({ 'hash': tx.tx, 'type': 'mint'})
                 this.setState({
                   transactionPending: false
                 });
@@ -176,8 +174,8 @@ class Mint extends Component {
           onClick={this.handleOpen}
           className={classes.root}
         >
-          <KeyboardArrowUp className={classes.leftIcon} />
-          Mint
+          <LocalPlay className={classes.leftIcon} />
+          Mint Tokens
         </Button>
         <Dialog
           open={this.state.open}

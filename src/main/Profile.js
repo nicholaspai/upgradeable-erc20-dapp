@@ -14,6 +14,8 @@ import TextField from '@material-ui/core/TextField'
 
 // MUI Icons
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SupervisorAccount from '@material-ui/icons/SupervisorAccount';
+import EvStation from '@material-ui/icons/EvStation'
 
 // Custom Components
 import MetaMaskAlert from '../web3/MetaMaskAlert'
@@ -52,6 +54,9 @@ const styles = theme => ({
   textField: {
     margin: theme.spacing.unit * 2,
     width: 400
+  },
+  leftIcon: {
+    marginRight: theme.spacing.unit
   }
 });
 
@@ -173,6 +178,7 @@ class Profile extends React.Component {
                           onClick={this.handleClickOpen}
                           className={classes.button}
                         >
+                          <SupervisorAccount className={classes.leftIcon} />
                           Verify address
                         </Button>)
                       }
@@ -183,6 +189,7 @@ class Profile extends React.Component {
                     <Typography className={classes.heading}>Set Default Gas Price</Typography>
                     <Typography className={classes.secondaryHeading}>
                       The default gas price used for sending transactions is:  {this.props.gasPrice} Gwei
+                      For more information on gas costs go <a href='https://ethgasstation.info/' target='_blank'>here</a>
                     </Typography>
                   </ExpansionPanelSummary>
                   <ExpansionPanelDetails>
@@ -200,6 +207,7 @@ class Profile extends React.Component {
                       color="primary"
                       onClick={this.submitGas}
                     >
+                    <EvStation className={classes.leftIcon} />
                     Update Gas cost
                     </Button>
                   </ExpansionPanelDetails>

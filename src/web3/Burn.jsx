@@ -11,7 +11,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 // Icons
-import KeyboardArrowUp from "@material-ui/icons/KeyboardArrowUp";
+import Polymer from "@material-ui/icons/Polymer";
 // Redux
 import { connect } from "react-redux";
 import { actions } from '../store/actions'
@@ -21,8 +21,6 @@ import MetaMaskAlert from "./MetaMaskAlert";
 import { withWeb3 } from "react-web3-provider";
 const contract = require("truffle-contract");
 
-
-
 // TokenProxy
 const abi_proxy = require("../UpgradeableERC20/build/contracts/TokenProxy.json");
 let TokenProxy = contract(abi_proxy);
@@ -30,10 +28,6 @@ let TokenProxy = contract(abi_proxy);
 // Token_V0
 const abi_v0 = require("../UpgradeableERC20/build/contracts/Token_V0.json");
 let Token_V0 = contract(abi_v0);
-
-// Token_V1
-const abi_v1 = require("../UpgradeableERC20/build/contracts/Token_V1.json");
-let Token_V1 = contract(abi_v1);
 
 const styles = theme => ({
   root: {
@@ -54,10 +48,12 @@ const mapState = state => ({
   verifiedAddress: state.general.verifiedAddress,
   gasPrice: state.general.gas,
   balance: state.general.balance,
+  transactions: state.general.transactions,
 });
 
 const mapDispatch = dispatch => ({
   setBalance: balance => dispatch(actions.setBalance(balance)),
+  addTransaction: transaction => dispatch(actions.addTransaction(transaction))
 });
 
 class Burn extends Component {
@@ -130,6 +126,7 @@ class Burn extends Component {
               )
               .then(tx => {
                 resolve(tx);
+                this.props.addTransaction({ 'hash': tx.tx, 'type': 'burn'})
                 this.setState({
                   transactionPending: false
                 });
@@ -214,8 +211,8 @@ class Burn extends Component {
           onClick={this.handleOpen}
           className={classes.root}
         >
-          <KeyboardArrowUp className={classes.leftIcon} />
-          Burn
+          <Polymer className={classes.leftIcon} />
+          Burn Tokens
         </Button>
         <Dialog
           open={this.state.open}

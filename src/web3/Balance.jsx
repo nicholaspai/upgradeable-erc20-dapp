@@ -31,10 +31,6 @@ let TokenProxy = contract(abi_proxy);
 const abi_v0 = require("../UpgradeableERC20/build/contracts/Token_V0.json");
 let Token_V0 = contract(abi_v0);
 
-// Token_V1
-const abi_v1 = require("../UpgradeableERC20/build/contracts/Token_V1.json");
-let Token_V1 = contract(abi_v1);
-
 const styles = theme => ({
   root: {
     margin: theme.spacing.unit
@@ -161,7 +157,7 @@ class Balance extends Component {
           className={classes.root}
         >
           <Autorenew className={classes.leftIcon} />
-          Refresh
+          Refresh Balance
         </Button>
         <TextField
           className={classes.margin}

@@ -6,7 +6,8 @@ export const initialState = {
 		gas: 25,
 		web3Loading: false,
 		verifiedAddress: "",
-		balance: 0
+		balance: 0,
+		transactions: [],
 	},
 	main: {
 		home: true,
@@ -34,6 +35,8 @@ export const general = (state = initialState.general, action) => {
 			return Object.assign({}, state, {
 				balance: action.balance
 			})
+		case TYPES.ADD_TRANSACTION:
+			return { ...state, transactions: [ ...state.transactions, action.transaction ] };
 		default:
 			return state
 	}

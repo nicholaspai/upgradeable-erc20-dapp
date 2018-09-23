@@ -6,11 +6,11 @@ import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider'
 
 // MUI Icons
 
 // Custom Components
-import SimpleLineChart from '../SimpleLineChart';
 import SimpleTable from '../SimpleTable';
 import SendERC20 from '../web3/SendERC20';
 import Balance from '../web3/Balance'
@@ -35,6 +35,9 @@ const styles = theme => ({
   tableContainer: {
     height: 320,
   },
+  section: {
+    marginTop: theme.spacing.unit*2,
+  }
 });
 
 class Home extends React.Component {
@@ -46,24 +49,21 @@ class Home extends React.Component {
         <CssBaseline />
         <div>
           <div className={classes.appBarSpacer} />
-                <Typography variant="display1" gutterBottom>
+                <Typography variant="display1" gutterBottom className={classes.section}>
                   Transfer and burn UpgradeableERC20
                 </Typography>
-                <Balance />
-                <SendERC20 />
-                <Burn />
-                {/*<Typography variant="display1" gutterBottom>
-                   Transactions History
-                 </Typography>
-                 <Typography component="div" className={classes.chartContainer}>
-                   <SimpleLineChart />
-                 </Typography>
-                 <Typography variant="display1" gutterBottom>
-                   Transactions
-                 </Typography>
-                 <div className={classes.tableContainer}>
-                   <SimpleTable />
-                 </div> */}
+                <Balance className={classes.section}/>
+                <Divider variant="inset" />
+                <SendERC20 className={classes.section}/>
+                <Divider variant="inset" />
+                <Burn className={classes.section}/>
+                <Divider variant="inset" />
+                <Typography variant="display1" gutterBottom className={classes.section}>
+                 Transactions
+                </Typography>
+                <div className={classes.tableContainer}>
+                 <SimpleTable />
+                </div> 
         </div>
       </React.Fragment>
     );

@@ -8,6 +8,17 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
+// Redux
+import { connect } from "react-redux";
+import { actions } from './store/actions'
+
+const mapState = state => ({
+  transactions: state.general.transactions,
+});
+
+const mapDispatch = dispatch => ({
+});
+
 const styles = {
   root: {
     width: '100%',
@@ -24,40 +35,42 @@ function createData(name, calories, fat, carbs, protein) {
   return { id, name, calories, fat, carbs, protein };
 }
 
-const data = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+const etherscan = (
+      <img
+        style={{ height: "20px", width: "auto" }}
+        alt="Etherscan"
+        src="https://db5islsn2p9x4.cloudfront.net/etherscan.png"
+      />
+    );
 
 function SimpleTable(props) {
   const { classes } = props;
+  const data = props.transactions
 
   return (
     <Paper className={classes.root}>
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell numeric>Calories</TableCell>
-            <TableCell numeric>Fat (g)</TableCell>
-            <TableCell numeric>Carbs (g)</TableCell>
-            <TableCell numeric>Protein (g)</TableCell>
+            <TableCell>Transaction Hash</TableCell>
+            <TableCell>Type of Transaction</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {data.map(n => {
             return (
-              <TableRow key={n.id}>
+              <TableRow key={n.hash}>
                 <TableCell component="th" scope="row">
-                  {n.name}
+                  <a href={
+                      "https://ropsten.etherscan.io/tx/" + n.hash
+                    }
+                    target="_blank"
+                    style={{ marginLeft: "8px" }}
+                  >
+                  {etherscan} {n.hash}
+                  </a>
                 </TableCell>
-                <TableCell numeric>{n.calories}</TableCell>
-                <TableCell numeric>{n.fat}</TableCell>
-                <TableCell numeric>{n.carbs}</TableCell>
-                <TableCell numeric>{n.protein}</TableCell>
+                <TableCell>{n.type}</TableCell>
               </TableRow>
             );
           })}
@@ -71,4 +84,4 @@ SimpleTable.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(SimpleTable);
+export default connect(mapState, mapDispatch)(withStyles(styles)(SimpleTable));

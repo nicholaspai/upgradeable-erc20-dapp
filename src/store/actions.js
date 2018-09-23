@@ -7,6 +7,7 @@ export const TYPES = {
 	SET_HOME: "SET_HOME",
 	SET_LOGIN: "SET_LOGIN",
 	SET_ADMIN: "SET_ADMIN",
+	ADD_TRANSACTION: "ADD_TRANSACTION",
 
 }
 
@@ -39,6 +40,10 @@ export const actions = {
 		type: TYPES.SET_ADMIN,
 		bool
 	}),
+	addTransaction: transaction => ({
+		type: TYPES.ADD_TRANSACTION,
+		transaction
+	})
 }
 
 // Reset main component

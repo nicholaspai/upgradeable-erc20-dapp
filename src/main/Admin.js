@@ -6,11 +6,11 @@ import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider'
 
 // MUI Icons
 
 // Custom Components
-import SimpleLineChart from '../SimpleLineChart';
 import SimpleTable from '../SimpleTable';
 import Mint from '../web3/Mint'
 
@@ -33,6 +33,9 @@ const styles = theme => ({
   tableContainer: {
     height: 320,
   },
+  section: {
+    marginTop: theme.spacing.unit*2,
+  }
 });
 
 class Admin extends React.Component {
@@ -44,10 +47,17 @@ class Admin extends React.Component {
         <CssBaseline />
         <div>
           <div className={classes.appBarSpacer} />
-                <Typography variant="display1" gutterBottom>
+                <Typography variant="display1" gutterBottom className={classes.section}>
                   You must be the contract owner to use these controls
                 </Typography>
-                <Mint />
+                <Mint className={classes.section}/>
+                <Divider variant='inset' />
+                <Typography variant="display1" gutterBottom className={classes.section}>
+                   Transaction History
+                 </Typography>
+                 <div className={classes.tableContainer}>
+                   <SimpleTable />
+                 </div>
         </div>
       </React.Fragment>
     );
